@@ -1,22 +1,22 @@
-\# Sprint 1 Complete
+# Sprint 1 Complete
 
 
 
-\## What was built
+## What was built
 
-\- 4 Ubuntu 24.04 VMs deployed in VMware Workstation Pro
+- 4 Ubuntu 24.04 VMs deployed in VMware Workstation Pro
 
-\- Custom VMnet2 configured at 192.168.100.0/24
+- Custom VMnet2 configured at 192.168.100.0/24
 
-\- Static IPs assigned to all VMs
+- Static IPs assigned to all VMs
 
-\- Splunk Enterprise 10.2.2 installed on VM1
+- Splunk Enterprise 10.2.2 installed on VM1
 
-\- Splunk web UI accessible at http://192.168.100.10:8000
+- Splunk web UI accessible at http://192.168.100.10:8000
 
 
 
-\## VM Network Reference
+## VM Network Reference
 
 | VM | Hostname | Internal IP |
 
@@ -34,7 +34,7 @@
 
 
 
-\## VM Specs
+## VM Specs
 
 | VM | RAM | vCPUs | Storage | Purpose |
 
@@ -50,23 +50,23 @@
 
 
 
-\## Tools installed
+## Tools installed
 
-\- Splunk Enterprise 10.2.2
+- Splunk Enterprise 10.2.2
 
-\- Ubuntu 24.04.4 LTS on all VMs
+- Ubuntu 24.04.4 LTS on all VMs
 
 
 
-\## Issues encountered and resolved
+## Issues encountered and resolved
 
-\- VMnet2 host adapter assigned APIPA address — fixed by
+- VMnet2 host adapter assigned APIPA address — fixed by
 
 &#x20; manually setting static IP to 192.168.100.1
 
-\- Splunk running as root warning — resolved by creating
+- Splunk running as root warning — resolved by creating
 
 &#x20; dedicated splunk user and reconfiguring boot start
 
-\- VM reboot caused host system freeze — resolved, no data lost
+- VM reboot caused host system freeze — resolved, no data lost
 
