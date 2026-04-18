@@ -60,13 +60,9 @@
 
 ## Issues encountered and resolved
 
-- VMnet2 host adapter assigned APIPA address — fixed by
+- VMnet2 host adapter assigned APIPA address — fixed by manually setting static IP to 192.168.100.1
 
-&#x20; manually setting static IP to 192.168.100.1
-
-- Splunk running as root warning — resolved by creating
-
-&#x20; dedicated splunk user and reconfiguring boot start
+- Splunk running as root warning — resolved by creating dedicated splunk user and reconfiguring boot start
 
 - VM reboot caused host system freeze — resolved, no data lost
 
