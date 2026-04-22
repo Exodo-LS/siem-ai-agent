@@ -58,23 +58,17 @@
 
 ## Issues encountered and resolved
 
-- Sysmon for Linux only generates EventID=1 (process creation)
+- Sysmon for Linux only generates EventID=1 (process creation) unlike Windows Sysmon which generates network, file, registry events
 
-&#x20; unlike Windows Sysmon which generates network, file, registry events
+- Resolved by building detections around EventID=1 and syslog sources
 
-&#x20; Resolved by building detections around EventID=1 and syslog sources
-
-- SPL field extraction required rex commands due to XML raw format
-
-&#x20; of Sysmon for Linux events
+- SPL field extraction required rex commands due to XML raw format of Sysmon for Linux events
 
 
 
 ## Architecture notes
 
-- VM3 runs both Sysmon (telemetry generator) and
-
-&#x20; Universal Forwarder (log shipper) simultaneously
+- VM3 runs both Sysmon (telemetry generator) and Universal Forwarder (log shipper) simultaneously
 
 - Logs route: VM3 Sysmon → journald → Universal Forwarder → VM1 Splunk port 9997 → soc-logs index
 
