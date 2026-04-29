@@ -9,16 +9,16 @@ load_dotenv()
 
 SPLUNK_HOST = os.getenv("SPLUNK_HOST")
 SPLUNK_PORT = os.getenv("SPLUNK_PORT")
-SPLUNK_USERNAME = os.getenv("SPLUNK_USERNAME")
-SPLUNK_PASSWORD = os.getenv("SPLUNK_PASSWORD")
+SPLUNK_USER = os.getenv("SPLUNK_USER")
+SPLUNK_PASS = os.getenv("SPLUNK_PASS")
 
 BASE_URL = f"https://{SPLUNK_HOST}:{SPLUNK_PORT}"
 
 def get_session_token():
     url = f"{BASE_URL}/services/auth/login"
     data = {
-        "username": SPLUNK_USERNAME,
-        "password": SPLUNK_PASSWORD,
+        "username": SPLUNK_USER,
+        "password": SPLUNK_PASS,
         "output_mode": "json"
     }
     response = requests.post(url, data=data, verify=False)

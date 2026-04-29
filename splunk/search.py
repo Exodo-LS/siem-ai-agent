@@ -39,7 +39,7 @@ def run_search(spl_query):
         time.sleep(1)
 
     # Step 3 — Fetch results
-    results_url = f"{BASE_URL}/services/search/jobs/{sid}/results?output_mode=json&count=10"
+    results_url = f"{BASE_URL}/services/search/jobs/{sid}/results?output_mode=json&count=50"
     results = requests.get(results_url, headers=headers, verify=False)
     results.raise_for_status()
     return results.json()
