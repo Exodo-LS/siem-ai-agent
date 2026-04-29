@@ -1,6 +1,8 @@
 from langgraph.graph import StateGraph, END
 from agent.state import TriageState
 from agent.nodes import (
+    produce_triage_report_validated,
+    reason_with_claude_safe,
     ingest_events,
     classify_severity,
     reason_with_claude,
@@ -12,8 +14,8 @@ def build_graph():
 
     graph.add_node("ingest", ingest_events)
     graph.add_node("classify", classify_severity)
-    graph.add_node("reason", reason_with_claude)
-    graph.add_node("report", produce_triage_report)
+    graph.add_node("reason", reason_with_claude_safe)
+    graph.add_node("report", produce_triage_report_validated)
 
     graph.set_entry_point("ingest")
 

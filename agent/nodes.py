@@ -114,3 +114,31 @@ def produce_triage_report(state: TriageState) -> TriageState:
     print(f"{'='*60}\n")
 
     return {**state, "triage_report": report}
+
+# ── Retry-wrapped Claude call ─────────────────────────────────────────────────
+from agent.retry import with_retry
+
+def reason_with_claude_safe(state: TriageState) -> TriageState:
+    """reason_with_claude with retry logic."""
+    def _call():
+        return reason_with_claude(state)
+    return with_retry(_call, max_attempts=3, base_delay=2)
+
+# ── Validation-wrapped report node ────────────────────────────────────────────
+from agent.validator import validate_triage_json
+
+def produce_triage_report_validated(state: TriageState) -> TriageState:
+    """produce_triage_report with schema validation."""
+    state = produce_triage_report(state)
+    if state.get("triage_report"):
+        is_valid, errors = validate_triage_json({
+            "incidents": state["triage_report"].get("incidents", []),
+            "summary": state["triage_report"].get("summary", ""),
+            "escalate": state["triage_report"].get("escalate", False),
+        })
+        if not is_valid:
+            print(f"[!] Schema validation warnings: {errors}")
+            logging.warning(f"Schema validation errors: {errors}")
+        else:
+            print("[*] Schema validation passed.")
+    return state
