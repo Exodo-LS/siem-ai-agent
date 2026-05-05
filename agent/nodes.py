@@ -142,3 +142,53 @@ def produce_triage_report_validated(state: TriageState) -> TriageState:
         else:
             print("[*] Schema validation passed.")
     return state
+
+# ── Memory-augmented Claude node ─────────────────────────────────────────────
+from agent.memory import get_memory_context, store_incidents
+
+def reason_with_claude_memory(state: TriageState) -> TriageState:
+    """reason_with_claude with Qdrant memory context injected into prompt."""
+    events_payload = json.dumps(state["classified_events"], indent=2)
+
+    # Build a query from the current event batch for memory lookup
+    severity_counts = {}
+    for e in state["classified_events"]:
+        s = e.get("_severity", "low")
+        severity_counts[s] = severity_counts.get(s, 0) + 1
+    query = f"severity {severity_counts} security events triage"
+
+    # Fetch similar past incidents from Qdrant
+    memory_context = get_memory_context(query, top_k=3)
+    if memory_context:
+        print(f"[memory] Injecting context:\n{memory_context}")
+    else:
+        print("[memory] No similar past incidents found.")
+
+    # Build system prompt with memory context
+    system_with_memory = SYSTEM_PROMPT
+    if memory_context:
+        system_with_memory += f"\n\n{memory_context}"
+
+    def _call():
+        return client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=2048,
+            system=system_with_memory,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Analyze these security events and return triage JSON:\n\n{events_payload}"
+                }
+            ]
+        )
+
+    message = with_retry(_call, max_attempts=3, base_delay=2)
+    analysis_text = message.content[0].text
+    print(f"[claude] Analysis received ({len(analysis_text)} chars).")
+    return {**state, "claude_analysis": analysis_text}
+
+def store_triage_memory(state: TriageState) -> TriageState:
+    """Store completed triage report incidents into Qdrant."""
+    if state.get("triage_report"):
+        store_incidents(state["triage_report"])
+    return state
