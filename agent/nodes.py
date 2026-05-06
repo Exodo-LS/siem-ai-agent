@@ -101,17 +101,18 @@ def produce_triage_report(state: TriageState) -> TriageState:
         "incidents": parsed.get("incidents", []),
     }
 
-    print(f"\n{'='*60}")
-    print(f"  TRIAGE REPORT — {report['event_count']} events analyzed")
-    print(f"  ESCALATE: {'🔴 YES' if report['escalate'] else '🟢 NO'}")
-    print(f"  Summary: {report['summary']}")
-    print(f"{'='*60}")
-    for inc in report["incidents"]:
-        print(f"\n  [{inc['severity'].upper()}] {inc['id']} — {inc['threat']}")
-        print(f"    MITRE: {inc.get('mitre_tactic')} / {inc.get('mitre_technique')}")
-        print(f"    Action: {inc['recommended_action']}")
-        print(f"    FP likelihood: {inc['false_positive_likelihood']}")
-    print(f"{'='*60}\n")
+    if not os.getenv("DEMO_MODE"):
+        print(f"\n{'='*60}")
+        print(f"  TRIAGE REPORT — {report['event_count']} events analyzed")
+        print(f"  ESCALATE: {'🔴 YES' if report['escalate'] else '🟢 NO'}")
+        print(f"  Summary: {report['summary']}")
+        print(f"{'='*60}")
+        for inc in report["incidents"]:
+            print(f"\n  [{inc['severity'].upper()}] {inc['id']} — {inc['threat']}")
+            print(f"    MITRE: {inc.get('mitre_tactic')} / {inc.get('mitre_technique')}")
+            print(f"    Action: {inc['recommended_action']}")
+            print(f"    FP likelihood: {inc['false_positive_likelihood']}")
+        print(f"{'='*60}\n")
 
     return {**state, "triage_report": report}
 
