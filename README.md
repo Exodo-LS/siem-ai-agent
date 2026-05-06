@@ -24,7 +24,7 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 | Sprint 3 | Splunk REST API + Python CLI | Done |
 | Sprint 4 | LangGraph agent + Claude triage | Done |
 | Sprint 5 | Qdrant vector memory integration | Done |
-| Sprint 6 | Demo-ready polish for CyberCon | Next |
+| Sprint 6 | Demo-ready polish for CyberCon | Done |
 
 ## Agent Pipeline
 
@@ -57,13 +57,38 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 
 ## Usage
 
+    # Live demo — injects attack scenario and runs full pipeline
+    python agent/demo.py
+
+    # Clean demo — resets Qdrant memory before run
+    python agent/demo.py --clean
+
+    # Run all detection rules
     python -m agent.run_agent
+
+    # Run a single rule
     python -m agent.run_agent --rule DR-001
+
+    # Custom SPL query
     python -m agent.run_agent 'index=soc-logs "Failed logon" | head 50'
+
+    # Continuous polling (60s interval)
     python agent/watcher.py
+
+    # Threat hunting - semantic search over past incidents
     python agent/memory_search.py "privilege escalation"
     python agent/memory_search.py "brute force 192.168.100.99"
     python agent/memory_search.py "encoded powershell"
+
+## Setup
+
+    git clone https://github.com/Exodo-LS/siem-ai-agent
+    cd siem-ai-agent
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    cp .env.example .env
+    # Edit .env with your credentials
 
 ## Docs
 
@@ -72,3 +97,4 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 - [Sprint 3 Complete](docs/sprint3-complete.md)
 - [Sprint 4 Complete](docs/sprint4-complete.md)
 - [Sprint 5 Complete](docs/sprint5-complete.md)
+- [Sprint 6 Complete](docs/sprint6-complete.md)
