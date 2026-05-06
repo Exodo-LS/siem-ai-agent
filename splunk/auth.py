@@ -1,3 +1,4 @@
+import logging
 import requests
 import os
 from dotenv import load_dotenv
@@ -24,7 +25,7 @@ def get_session_token():
     response = requests.post(url, data=data, verify=False)
     response.raise_for_status()
     token = response.json()["sessionKey"]
-    print(f"[+] Auth successful. Session token: {token[:20]}...")
+    logging.info(f"Auth successful. Session token: {token[:20]}...")
     return token
 
 if __name__ == "__main__":

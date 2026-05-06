@@ -1,3 +1,4 @@
+import logging
 import requests
 import time
 import os
@@ -26,14 +27,14 @@ def run_search(spl_query):
     response = requests.post(search_url, headers=headers, data=data, verify=False)
     response.raise_for_status()
     sid = response.json()["sid"]
-    print(f"[+] Search job created. SID: {sid}")
+    logging.info(f"Search job created. SID: {sid}")
 
     # Step 2 — Poll until complete
     job_url = f"{BASE_URL}/services/search/jobs/{sid}?output_mode=json"
     while True:
         status = requests.get(job_url, headers=headers, verify=False).json()
         state = status["entry"][0]["content"]["dispatchState"]
-        print(f"[*] Job state: {state}")
+        logging.debug(f"Job state: {state}")
         if state == "DONE":
             break
         time.sleep(1)

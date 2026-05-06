@@ -1,3 +1,5 @@
+import os
+os.environ["HF_HUB_DISABLE_IMPLICIT_TOKEN"] = "1"
 import json
 import sys
 import os

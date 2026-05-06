@@ -1,3 +1,5 @@
+import os
+os.environ["HF_HUB_DISABLE_IMPLICIT_TOKEN"] = "1"
 # agent/watcher.py
 # Polling loop — runs all detection rules on a schedule
 

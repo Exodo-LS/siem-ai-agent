@@ -1,3 +1,5 @@
+import os
+os.environ["HF_HUB_DISABLE_IMPLICIT_TOKEN"] = "1"
 # agent/memory_search.py
 # Threat hunting CLI — semantic search over past triage incidents
 
