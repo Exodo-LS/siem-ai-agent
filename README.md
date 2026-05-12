@@ -67,7 +67,7 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 | T1059.004 | Unix Shell Script Execution | Active |
 | T1053.003 | Cron Persistence | Active |
 | T1136.001 | Local Account Creation | Active |
-| T1548.001 | Setuid Privilege Escalation | Sprint 9 |
+| T1548.001 | Setuid Privilege Escalation | Active |
 
 ## Usage
 
