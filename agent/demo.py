@@ -88,7 +88,7 @@ def run_demo():
     # Step 3 — Run LangGraph agent
     print_step("AGENT", "Starting LangGraph triage pipeline...")
     graph = build_graph()
-    final_state = graph.invoke({"raw_events": events})
+    final_state = graph.invoke({"raw_events": events, "reasoning_round": 1, "followup_queries": [], "followup_results": [], "reasoning_chain": []})
 
     if final_state.get("error"):
         print(f"[!] Agent error: {final_state['error']}")

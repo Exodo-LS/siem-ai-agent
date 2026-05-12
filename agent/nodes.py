@@ -193,3 +193,121 @@ def store_triage_memory(state: TriageState) -> TriageState:
     if state.get("triage_report"):
         store_incidents(state["triage_report"])
     return state
+
+# ── Follow-up query generation node ──────────────────────────────────────────
+FOLLOWUP_PROMPT = """You are a Tier-2 SOC analyst. You have completed an initial triage of security events.
+Based on your analysis, identify what additional Splunk queries would help confirm or deny your findings.
+
+Return ONLY a JSON object with this schema — no prose outside the JSON:
+{
+  "followup_queries": [
+    {
+      "reason": "why you need this query",
+      "spl": "index=soc-logs ... | head 20"
+    }
+  ],
+  "needs_followup": true
+}
+
+If no follow-up is needed, return:
+{
+  "followup_queries": [],
+  "needs_followup": false
+}
+
+Rules:
+- Maximum 3 follow-up queries
+- Each query must start with index=soc-logs
+- Only request follow-up if it would materially change the triage outcome
+- Do not request follow-up if events are clearly benign or clearly malicious"""
+
+def generate_followup_queries(state: TriageState) -> TriageState:
+    """Ask Claude what additional Splunk queries it needs to complete triage."""
+    round_num = state.get("reasoning_round", 1)
+    print(f"[claude] Round {round_num} complete. Generating follow-up queries...")
+
+    reasoning_chain = state.get("reasoning_chain") or []
+    reasoning_chain.append({
+        "round": round_num,
+        "analysis": state.get("claude_analysis", ""),
+        "followup_queries": [],
+    })
+
+    def _call():
+        return client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=512,
+            system=FOLLOWUP_PROMPT,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Based on this initial analysis, what follow-up queries do you need?\n\n{state.get('claude_analysis', '')}"
+                }
+            ]
+        )
+
+    message = with_retry(_call, max_attempts=3, base_delay=2)
+    raw = message.content[0].text
+    raw = re.sub(r"```json|```", "", raw).strip()
+
+    try:
+        parsed = json.loads(raw)
+        queries = parsed.get("followup_queries", [])
+        needs_followup = parsed.get("needs_followup", False)
+    except json.JSONDecodeError:
+        queries = []
+        needs_followup = False
+
+    if queries:
+        reasoning_chain[-1]["followup_queries"] = queries
+        print(f"[followup] {len(queries)} follow-up queries requested.")
+    else:
+        print("[followup] No follow-up queries needed.")
+
+    return {
+        **state,
+        "followup_queries": queries if needs_followup else [],
+        "reasoning_chain": reasoning_chain,
+    }
+
+
+# ── Follow-up query execution node ───────────────────────────────────────────
+import sys as _sys
+_sys.path.insert(0, "/home/socadmin/siem-ai-agent")
+
+def execute_followup_queries(state: TriageState) -> TriageState:
+    """Execute follow-up SPL queries against Splunk and append results."""
+    from splunk.search import run_search
+    from splunk.formatter import parse_results
+
+    queries = state.get("followup_queries", [])
+    if not queries:
+        return {**state, "followup_results": []}
+
+    all_followup_events = []
+    for q in queries:
+        spl = q.get("spl", "")
+        reason = q.get("reason", "")
+        print(f"[followup] Running: {reason}")
+        print(f"           SPL: {spl}")
+        try:
+            results = run_search(spl)
+            events = parse_results(results)
+            for e in events:
+                e["_followup_reason"] = reason
+            all_followup_events.extend(events)
+            print(f"           → {len(events)} events returned.")
+        except Exception as ex:
+            print(f"           → Error: {ex}")
+
+    print(f"[followup] {len(all_followup_events)} total follow-up events retrieved.")
+
+    # Merge follow-up events into classified events for second reasoning pass
+    merged = state.get("classified_events", []) + all_followup_events
+
+    return {
+        **state,
+        "followup_results": all_followup_events,
+        "classified_events": merged,
+        "reasoning_round": state.get("reasoning_round", 1) + 1,
+    }
