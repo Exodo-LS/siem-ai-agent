@@ -44,12 +44,13 @@ def run_atomic_attacks():
         "\"pwsh -Command \\\"Import-Module ~/AtomicRedTeam/invoke-atomicredteam/Invoke-AtomicRedTeam.psd1; "
         "Invoke-AtomicTest T1059.004 -TestNumbers 1; "
         "Invoke-AtomicTest T1053.003 -TestNumbers 1; "
-        "Invoke-AtomicTest T1136.001 -TestNumbers 1\\\"\"" 
+        "Invoke-AtomicTest T1136.001 -TestNumbers 1; Invoke-AtomicTest T1548.001 -TestNumbers 1\\\"\"" 
     )
     os.system(cmd)
     print("         T1059.004 — Bash script execution")
     print("         T1053.003 — Cron persistence")
     print("         T1136.001 — Local account creation")
+    print("         T1548.001 — Setuid privilege escalation")
     print("         Waiting 20s for Sysmon + Universal Forwarder...")
     time.sleep(20)
 
@@ -60,7 +61,7 @@ def cleanup_atomic():
         "\"pwsh -Command \\\"Import-Module ~/AtomicRedTeam/invoke-atomicredteam/Invoke-AtomicRedTeam.psd1; "
         "Invoke-AtomicTest T1053.003 -TestNumbers 1 -Cleanup; "
         "Invoke-AtomicTest T1059.004 -TestNumbers 1 -Cleanup; "
-        "Invoke-AtomicTest T1136.001 -TestNumbers 1 -Cleanup -ExecutionLogPath /dev/null\\\"\"" 
+        "Invoke-AtomicTest T1136.001 -TestNumbers 1 -Cleanup; Invoke-AtomicTest T1548.001 -TestNumbers 1 -Cleanup\\\"\"" 
     )
     os.system(cmd)
     print("         Artifacts cleaned.")
