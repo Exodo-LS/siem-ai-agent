@@ -14,7 +14,7 @@ SPLUNK_HOST = os.getenv("SPLUNK_HOST")
 SPLUNK_PORT = os.getenv("SPLUNK_PORT")
 BASE_URL = f"https://{SPLUNK_HOST}:{SPLUNK_PORT}"
 
-def run_search(spl_query):
+def run_search(spl_query, timeout=30):
     token = get_session_token()
     headers = {"Authorization": f"Splunk {token}"}
 
@@ -31,7 +31,11 @@ def run_search(spl_query):
 
     # Step 2 — Poll until complete
     job_url = f"{BASE_URL}/services/search/jobs/{sid}?output_mode=json"
+    import time as _time
+    start = _time.time()
     while True:
+        if _time.time() - start > timeout:
+            raise TimeoutError(f"Search timed out after {timeout}s")
         status = requests.get(job_url, headers=headers, verify=False).json()
         state = status["entry"][0]["content"]["dispatchState"]
         logging.debug(f"Job state: {state}")

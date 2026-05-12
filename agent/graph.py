@@ -14,7 +14,7 @@ def should_followup(state: TriageState) -> str:
     """Route to follow-up execution or straight to report."""
     queries = state.get("followup_queries", [])
     round_num = state.get("reasoning_round", 1)
-    if queries and round_num <= 2:
+    if queries and round_num < 3:
         return "execute"
     return "report"
 

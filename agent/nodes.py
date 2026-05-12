@@ -291,7 +291,10 @@ def execute_followup_queries(state: TriageState) -> TriageState:
         print(f"[followup] Running: {reason}")
         print(f"           SPL: {spl}")
         try:
-            results = run_search(spl)
+            # Force recent time window to prevent Claude generating slow historical queries
+            if "earliest=" not in spl:
+                spl = spl.rstrip() + " earliest=-15m"
+            results = run_search(spl, timeout=20)
             events = parse_results(results)
             for e in events:
                 e["_followup_reason"] = reason
