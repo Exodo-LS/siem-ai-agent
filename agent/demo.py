@@ -118,6 +118,15 @@ def run_demo():
     print(f"  Report saved to triage_output.json")
     print(f"  Memory stored to Qdrant — searchable via memory_search.py")
     print(f"{'═'*62}")
+    # Show reasoning chain if follow-ups were run
+    chain = final_state.get("reasoning_chain", [])
+    followup_results = final_state.get("followup_results", [])
+    if followup_results:
+        print(f"\n  REASONING CHAIN:")
+        for step in chain:
+            print(f"  Round {step['round']}: {len(step.get('followup_queries', []))} follow-up queries generated")
+        print(f"  {len(followup_results)} additional events retrieved via follow-up queries")
+
     print(f"\n  Demo completed: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 if __name__ == "__main__":
