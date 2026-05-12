@@ -8,12 +8,12 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 |---|---|---|---|
 | VM1 | vm1-splunk | 192.168.100.10 | Splunk 10.2.2 |
 | VM2 | vm2-agent | 192.168.100.20 | AI Agent + LangGraph |
-| VM3 | vm3-forwarder | 192.168.100.30 | Sysmon + Universal Forwarder |
+| VM3 | vm3-forwarder | 192.168.100.30 | Sysmon + Universal Forwarder + Atomic Red Team |
 | VM4 | vm4-qdrant | 192.168.100.40 | Qdrant Vector Database |
 
 ## Architecture
 
-    VM3 (Sysmon) -> VM1 (Splunk) -> VM2 (LangGraph + Claude Sonnet) -> VM4 (Qdrant Memory)
+    VM3 (Sysmon + Atomic Red Team) -> VM1 (Splunk) -> VM2 (LangGraph + Claude Sonnet) -> VM4 (Qdrant Memory)
 
 ## Sprint Progress
 
@@ -25,6 +25,9 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 | Sprint 4 | LangGraph agent + Claude triage | Done |
 | Sprint 5 | Qdrant vector memory integration | Done |
 | Sprint 6 | Demo-ready polish for CyberCon | Done |
+| Sprint 7 | Agent v2 multi-step reasoning | Done |
+| Sprint 8 | Atomic Red Team simulations | Done |
+| Sprint 9 | Polish, dashboard, final cleanup | Next |
 
 ## Agent Pipeline
 
@@ -36,7 +39,9 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
       |- Node 1: Ingest Events
       |- Node 2: Classify Severity
       |- Node 3: Reason with Claude Sonnet (+ Qdrant memory context)
-      |- Node 4: Produce Triage Report + Store to Qdrant
+      |- Node 4: Generate Follow-up Queries (multi-step reasoning)
+      |- Node 5: Execute Follow-up Queries against Splunk
+      |- Node 6: Produce Triage Report + Store to Qdrant
          |
     triage_output.json + triage_reports/
 
@@ -55,9 +60,18 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 | DR-009 | Lateral Movement - Remote Desktop Activity | TA0008 - Lateral Movement |
 | DR-010 | Defense Evasion - Script Interpreter Abuse | TA0005 - Defense Evasion |
 
+## Atomic Red Team Techniques
+
+| Technique | Name | Status |
+|---|---|---|
+| T1059.004 | Unix Shell Script Execution | Active |
+| T1053.003 | Cron Persistence | Active |
+| T1136.001 | Local Account Creation | Active |
+| T1548.001 | Setuid Privilege Escalation | Sprint 9 |
+
 ## Usage
 
-    # Live demo — injects attack scenario and runs full pipeline
+    # Live demo — real Atomic Red Team attacks + full pipeline
     python agent/demo.py
 
     # Clean demo — resets Qdrant memory before run
@@ -98,3 +112,5 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 - [Sprint 4 Complete](docs/sprint4-complete.md)
 - [Sprint 5 Complete](docs/sprint5-complete.md)
 - [Sprint 6 Complete](docs/sprint6-complete.md)
+- [Sprint 7 Complete](docs/sprint7-complete.md)
+- [Sprint 8 Complete](docs/sprint8-complete.md)
