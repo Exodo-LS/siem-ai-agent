@@ -6,7 +6,7 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 
 | VM | Hostname | IP | Role |
 |---|---|---|---|
-| VM1 | vm1-splunk | 192.168.100.10 | Splunk 10.2.2 |
+| VM1 | vm1-splunk | 192.168.100.10 | Splunk 10.2.2 + AI Triage Dashboard |
 | VM2 | vm2-agent | 192.168.100.20 | AI Agent + LangGraph |
 | VM3 | vm3-forwarder | 192.168.100.30 | Sysmon + Universal Forwarder + Atomic Red Team |
 | VM4 | vm4-qdrant | 192.168.100.40 | Qdrant Vector Database |
@@ -27,7 +27,8 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 | Sprint 6 | Demo-ready polish for CyberCon | Done |
 | Sprint 7 | Agent v2 multi-step reasoning | Done |
 | Sprint 8 | Atomic Red Team simulations | Done |
-| Sprint 9 | Polish, dashboard, final cleanup | Next |
+| Sprint 9 | Dashboard, T1548.001, final polish | Done |
+| Sprint 10 | Cert push — Splunk + SAL1 | Next |
 
 ## Agent Pipeline
 
@@ -69,12 +70,16 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 | T1136.001 | Local Account Creation | Active |
 | T1548.001 | Setuid Privilege Escalation | Active |
 
+## Splunk Dashboard
+AI Triage Overview dashboard on VM1 includes:
+- Event volume + escalation status indicators
+- MITRE ATT&CK technique coverage bar chart
+- Process execution timeline
+- Attack commands detected table with full command line extraction
+
 ## Usage
 
     # Live demo — real Atomic Red Team attacks + full pipeline
-    python agent/demo.py
-
-    # Clean demo — resets Qdrant memory before run
     python agent/demo.py --clean
 
     # Run all detection rules
@@ -114,3 +119,4 @@ AI-powered SIEM triage agent using Splunk, LangGraph, and Claude Sonnet
 - [Sprint 6 Complete](docs/sprint6-complete.md)
 - [Sprint 7 Complete](docs/sprint7-complete.md)
 - [Sprint 8 Complete](docs/sprint8-complete.md)
+- [Sprint 9 Complete](docs/sprint9-complete.md)
