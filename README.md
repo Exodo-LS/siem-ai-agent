@@ -120,3 +120,23 @@ AI Triage Overview dashboard on VM1 includes:
 - [Sprint 7 Complete](docs/sprint7-complete.md)
 - [Sprint 8 Complete](docs/sprint8-complete.md)
 - [Sprint 9 Complete](docs/sprint9-complete.md)
+
+## Troubleshooting
+
+### Splunk dashboard shows no data
+1. Check Sysmon is running on VM3: `sudo systemctl status sysmon`
+   - If failed with start-limit-hit: `sudo systemctl reset-failed sysmon && sudo systemctl start sysmon`
+2. Check Universal Forwarder on VM3: `sudo systemctl status SplunkForwarder`
+3. Verify events are recent: search `index=soc-logs source="journald://sysmon" | stats max(_time)`
+
+### Splunk license expired (litsearch errors)
+Switch to the permanent Free license:
+- Settings → Licensing → Change license group → Free → Restart
+
+### Agent gets 401 from Splunk REST API under Free license
+The Free license disables remote login by default. Add to /opt/splunk/etc/system/local/server.conf:
+
+    [general]
+    allowRemoteLogin = always
+
+Then restart Splunk.
