@@ -58,9 +58,15 @@ def run_atomic_attacks():
         "\"pwsh -Command \\\"Import-Module ~/AtomicRedTeam/invoke-atomicredteam/Invoke-AtomicRedTeam.psd1; "
         "Invoke-AtomicTest T1059.004 -TestNumbers 1; "
         "Invoke-AtomicTest T1053.003 -TestNumbers 1; "
-        "Invoke-AtomicTest T1136.001 -TestNumbers 1; Invoke-AtomicTest T1548.001 -TestNumbers 1\\\"\"" 
+        "Invoke-AtomicTest T1548.001 -TestNumbers 1\\\"\""
     )
     os.system(cmd)
+    # T1136.001 needs root for useradd — run via sudo with TTY
+    useradd_cmd = (
+        "ssh -tt -o StrictHostKeyChecking=no socadmin@192.168.100.30 "
+        "\"sudo useradd -M -N -r -s /bin/bash -c evil_account evil_user\""
+    )
+    os.system(useradd_cmd)
     print("         T1059.004 — Bash script execution")
     print("         T1053.003 — Cron persistence")
     print("         T1136.001 — Local account creation")
@@ -75,9 +81,11 @@ def cleanup_atomic():
         "\"pwsh -Command \\\"Import-Module ~/AtomicRedTeam/invoke-atomicredteam/Invoke-AtomicRedTeam.psd1; "
         "Invoke-AtomicTest T1053.003 -TestNumbers 1 -Cleanup; "
         "Invoke-AtomicTest T1059.004 -TestNumbers 1 -Cleanup; "
-        "Invoke-AtomicTest T1136.001 -TestNumbers 1 -Cleanup; Invoke-AtomicTest T1548.001 -TestNumbers 1 -Cleanup\\\"\"" 
+        "Invoke-AtomicTest T1548.001 -TestNumbers 1 -Cleanup\\\"\"" 
     )
     os.system(cmd)
+    # T1136.001 cleanup — remove root-created evil_user via sudo
+    os.system("ssh -tt -o StrictHostKeyChecking=no socadmin@192.168.100.30 \"sudo userdel evil_user 2>/dev/null\"")
     print("         Artifacts cleaned.")
 
 def run_demo():

@@ -14,7 +14,10 @@ SPLUNK_HOST = os.getenv("SPLUNK_HOST")
 SPLUNK_PORT = os.getenv("SPLUNK_PORT")
 BASE_URL = f"https://{SPLUNK_HOST}:{SPLUNK_PORT}"
 
-def run_search(spl_query, timeout=30):
+def run_search(spl_query, timeout=45):
+    # Inject a default time window if the query has no time bound, to prevent full-index scans
+    if "earliest=" not in spl_query and "latest=" not in spl_query:
+        spl_query = f"{spl_query} earliest=-15m"
     token = get_session_token()
     headers = {"Authorization": f"Splunk {token}"}
 
