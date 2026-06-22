@@ -37,6 +37,20 @@ def reset_qdrant():
     )
     print("         Qdrant memory cleared.")
 
+def check_sysmon_health():
+    """Verify Sysmon is running on VM3, restart if needed before demo."""
+    print_step("HEALTH", "Verifying Sysmon is active on VM3...")
+    status = os.popen('ssh -o StrictHostKeyChecking=no socadmin@192.168.100.30 "systemctl is-active sysmon" 2>/dev/null').read().strip()
+    if status == "active":
+        print("         Sysmon is active.")
+    else:
+        print(f"         Sysmon status: {status} — restarting...")
+        os.system('ssh -o StrictHostKeyChecking=no socadmin@192.168.100.30 "sudo systemctl reset-failed sysmon; sudo systemctl restart sysmon" 2>/dev/null')
+        import time as _t
+        _t.sleep(3)
+        recheck = os.popen('ssh -o StrictHostKeyChecking=no socadmin@192.168.100.30 "systemctl is-active sysmon" 2>/dev/null').read().strip()
+        print(f"         Sysmon now: {recheck}")
+
 def run_atomic_attacks():
     print_step("ATTACK", "Executing Atomic Red Team simulations on VM3...")
     cmd = (
@@ -78,6 +92,7 @@ def run_demo():
     print(f"  VM3 Attacker: 192.168.100.30 (Atomic Red Team)")
     print(f"  VM4 Qdrant:   192.168.100.40")
 
+    check_sysmon_health()
     run_atomic_attacks()
 
     print_step("SPLUNK", "Querying Splunk for Atomic Red Team telemetry...")
