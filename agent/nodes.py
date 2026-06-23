@@ -218,6 +218,11 @@ If no follow-up is needed, return:
 Rules:
 - Maximum 3 follow-up queries
 - Each query must start with index=soc-logs
+- ALWAYS include an explicit time bound (earliest=-30m) to keep queries fast
+- The data source is Linux Sysmon. Events are raw XML — search using bare keyword terms (e.g. "evil_user", "/tmp/hello", "chmod") NOT structured field filters
+- Do NOT use field filters that may not exist (uid=, COMMAND=, sourcetype=linux_secure, src_ip=, action=, authentication_method=). These cause timeouts and empty results
+- To filter process-creation events use the literal term "<EventID>1<"
+- Prefer simple keyword searches over complex stats; if using stats, only group by _time or host
 - Only request follow-up if it would materially change the triage outcome
 - Do not request follow-up if events are clearly benign or clearly malicious"""
 
